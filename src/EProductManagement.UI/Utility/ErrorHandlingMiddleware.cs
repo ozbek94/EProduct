@@ -34,8 +34,8 @@ namespace EProductManagement.UI.Utility
             var code = HttpStatusCode.InternalServerError;
 
             _logger.LogError(ex, "500 Error", context.Request, context.Response);
-
-            var result = JsonConvert.SerializeObject(new { ErrorMessage = "An error occurred.", TraceId = Guid.NewGuid().ToString() });
+            Console.WriteLine(ex.Message);
+            var result = JsonConvert.SerializeObject(new { ErrorMessage = ex.Message, TraceId = Guid.NewGuid().ToString() });
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)code;
             return context.Response.WriteAsync(result);

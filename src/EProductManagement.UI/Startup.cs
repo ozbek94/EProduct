@@ -1,13 +1,18 @@
 using Autofac;
 using AutoMapper;
 using EProductManagement.Data.Contexts;
+using EProductManagement.Data.Repositories;
+using EProductManagement.Data.Transactions;
 using EProductManagement.Domain.Helpers;
+using EProductManagement.Domain.Repositories;
+using EProductManagement.Domain.Services;
 using EProductManagement.UI.Utility;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +38,7 @@ namespace EProductManagement.UI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
@@ -42,29 +48,37 @@ namespace EProductManagement.UI
                 {
                     opt.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                        );
+
+            var audienceConfig = Configuration.GetSection("Audience");
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(audienceConfig["Secret"])),
+                ValidateIssuer = true,
+                ValidIssuer = audienceConfig["Iss"],
+                ValidateAudience = true,
+                ValidAudience = audienceConfig["Aud"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+                RequireExpirationTime = true,
+            };
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(x =>
+            {
+                x.TokenValidationParameters = tokenValidationParameters;
+            });
 
             var connection = Configuration["ConnectionStrings:TemplateServiceConnectionString"];
-            services.AddDbContext<PostgreSqlContext>(options => options.UseNpgsql(connection));
+            services.AddDbContext<PostgreSqlContext>(options => options.UseNpgsql("Host=localhost;Database=EProductManagement;Username=postgres;Password=A123456."));
 
             var appSettings = Configuration.GetSection("AppSettings").Get<AppSettings>();
-            services.AddSingleton(appSettings);
-
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
-
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddSingleton(appSettings);            
 
             services.AddSwaggerGen(c =>
             {

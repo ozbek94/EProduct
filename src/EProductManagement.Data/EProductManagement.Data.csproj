@@ -1,8 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20211015133415_Initial Migration.cs" />
+    <Compile Remove="Migrations\20211015133415_Initial Migration.Designer.cs" />
+    <Compile Remove="Migrations\20211015140523_Initial Migration2.cs" />
+    <Compile Remove="Migrations\20211015140523_Initial Migration2.Designer.cs" />
+    <Compile Remove="Migrations\20211015140916_Initial Migration.cs" />
+    <Compile Remove="Migrations\20211015140916_Initial Migration.Designer.cs" />
+    <Compile Remove="Migrations\20211015141446_Initial Migration.cs" />
+    <Compile Remove="Migrations\20211015141446_Initial Migration.Designer.cs" />
+    <Compile Remove="Migrations\20211015142206_Initial Migration2.cs" />
+    <Compile Remove="Migrations\20211015142206_Initial Migration2.Designer.cs" />
+    <Compile Remove="Migrations\20211015142435_Initial Migration3.cs" />
+    <Compile Remove="Migrations\20211015142435_Initial Migration3.Designer.cs" />
+    <Compile Remove="Migrations\20211111143509_Initial Migration 6.cs" />
+    <Compile Remove="Migrations\20211111143509_Initial Migration 6.Designer.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.19" />
@@ -12,11 +29,6 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.18" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Configs\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>

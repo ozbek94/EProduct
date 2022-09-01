@@ -9,5 +9,9 @@ namespace EProductManagement.Domain.Entities
         public int Id { get; set; }
         public DateTime InsertTime { get; set; }
         public DateTime? DeleteTime { get; set; }
+        public EntityBase()
+        {
+            InsertTime = DateTime.Now;
+        }
     }
 }
